@@ -62,22 +62,6 @@
             swreg.showNotification('PWA Rocks!', options)
           })
         }
-      },
-      askForNotificationPermission: function () {
-        let that = this
-        Notification.requestPermission(function (result) {
-          console.log('User Choice', result)
-          if (result !== 'granted') {
-            console.log('No notification permission granted!')
-          } else {
-            that.displayConfirmNotification()
-          }
-        })
-      }
-    },
-    created () {
-      if ('Notification' in window) {
-        this.askForNotificationPermission()
       }
     }
   }

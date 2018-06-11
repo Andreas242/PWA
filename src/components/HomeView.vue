@@ -1,5 +1,50 @@
 <template>
-  <div class="basic-setup">
+<div class="wrapper">
+        <div class="top">
+            <header class="hero">
+                <h1>PWA</h1>
+                <p>for today and tomorrow</p>
+            </header>
+            <div class="cta cta1">
+                <p class="header__external__link">
+				<a href="https://developers.google.com/web/fundamentals/web-app-manifest/">Manifest</a></p>
+                <p>One of the key features of a PWA</p>
+                
+            </div>
+            <div class="cta cta2">
+                    <p class="header__external__link">
+					<a href="https://developers.google.com/web/fundamentals/primers/service-workers/">Service workers</a></p>
+                    <p>Another key feature of a PWA</p>
+                    
+            </div>
+        </div>
+        <nav class="menu">
+            <button aria-expanded="true" aria-controls="menu-list"> 
+                <div class="container">
+                    <div class="bar1"></div>
+                    <div class="bar2"></div>
+                    <div class="bar3"></div>
+                  </div>
+            </button>
+            <ul>
+                <li>
+                    <a href="#">Home</a> 
+                </li>
+                <li>
+                    <a href="#">Stuff</a>
+                    
+                </li>
+                <li>
+                    <a href="#">Help</a>
+                    
+                </li>
+                <li>
+                    <a id="install">A2HS</a>                  
+                </li>
+            </ul>
+        </nav>
+
+  <div>
   <div class="players">
     <transition-group name="list" tag="div" class="score" keep-alive>
     <div v-for="(player, index) in players" :key="player.id" class="image-card">
@@ -25,6 +70,7 @@
   </transition-group>
   </div>
 </div>
+</div>
 </template>
 
 <script>
@@ -34,7 +80,8 @@ export default {
       myDev: localStorage.id,
       name: localStorage.name || '',
       showWelcome: true,
-      players: []
+      players: [],
+      deferredPrompt: undefined
     }
   },
   methods: {
@@ -65,6 +112,42 @@ export default {
     this.$root.$first = '2'
     // this.savePlayersToCache()
     this.getPlayers()
+    this.installButton = document.querySelector('#install')
+    console.log(this.installButton)
+    this.installButton.style.display = 'block'
+    this.installButton.addEventListener('click', (e) => {
+      // hide our user interface that shows our A2HS button
+      this.installButton.style.display = 'none'
+      // Show the prompt
+      this.deferredPrompt.prompt()
+      // Wait for the user to respond to the prompt
+      this.deferredPrompt.userChoice
+        .then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('User accepted the A2HS prompt')
+          } else {
+            console.log('User dismissed the A2HS prompt')
+          }
+          this.deferredPrompt = null
+        })
+    })
+  },
+  created () {
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // Prevent Chrome 67 and earlier from automatically showing the prompt
+      e.preventDefault()
+      alert(e)
+      // Stash the event so it can be triggered later.
+      this.deferredPrompt = e
+    })
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      alert('ah!')
+      e.preventDefault()
+      this.deferredPrompt = e
+      // Update UI notify the user they can add to home screen
+      this.installButton.style.display = 'block'
+    })
   }
 }
 </script>
